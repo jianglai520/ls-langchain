@@ -1,0 +1,19 @@
+[project]
+name = "ls-base"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Jianglai", email = "lingxg2024@lzu.edu.cn" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "notebook>=7.6.1",
+    "openai>=2.53.0",
+]
+
+[project.scripts]
+ls-base = "ls_base:main"
+
+[build-system]
+requires = ["uv_build>=0.12.2,<0.13.0"]
+build-backend = "uv_build"
