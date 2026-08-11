@@ -29,17 +29,25 @@ web_search = TavilySearch(
 
 # 4.初始化checkpointer
 
-#连接sqlite
-# 使用基于文件位置的绝对路径，避免相对路径受启动目录影响
-DB_PATH = Path(__file__).resolve().parent.parent / "db" / "personal_chief.db"
-DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-connection = sqlite3.connect(str(DB_PATH), check_same_thread = False)
+# 判断是否运行在 LangGraph 平台（langgraph dev / 部署）下：
+# 平台会自动注入 LANGGRAPH_API_URL，并由平台统一管理持久化，
+# 此时不能传入自定义 checkpointer，否则图加载会直接失败。
+RUNNING_ON_LANGGRAPH_PLATFORM = bool(os.getenv("LANGGRAPH_API_URL"))
 
-# 初始化checkpointer
-checkpointer = SqliteSaver(connection)
+if RUNNING_ON_LANGGRAPH_PLATFORM:
+    checkpointer = None
+else:
+    # 连接sqlite
+    # 使用基于文件位置的绝对路径，避免相对路径受启动目录影响
+    DB_PATH = Path(__file__).resolve().parent.parent / "db" / "personal_chief.db"
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    connection = sqlite3.connect(str(DB_PATH), check_same_thread = False)
 
-# 自动建表
-checkpointer.setup()
+    # 初始化checkpointer
+    checkpointer = SqliteSaver(connection)
+
+    # 自动建表
+    checkpointer.setup()
 
 
 # 5.agent系统提示词
